@@ -5470,17 +5470,40 @@ if __name__ == "__main__":
         
         @app.route(f"/{TOKEN}", methods=["POST"])
         def webhook():
-            update = telebot.types.Update.de_json(request.stream.read().decode("utf-8"))
-            bot.process_new_updates([update])
+            try:
+                update = request.get_json(force=True)
+                if "message" in update:
+                    threading.Thread(target=handle_message, args=(update["message"],), daemon=True).start()
+                elif "callback_query" in update:
+                    threading.Thread(target=handle_callback, args=(update["callback_query"],), daemon=True).start()
+            except Exception as e:
+                print(f"[WEBHOOK] {e}")
             return "OK", 200
         
         @app.route("/", methods=["GET"])
         def health():
             return "Bot is alive!", 200
         
-        bot.remove_webhook()
-        bot.set_webhook(url=f"{RENDER_URL}/{TOKEN}")
+        # Webhook সেট করুন (requests দিয়ে)
+        requests.get(f"{BASE_URL}/deleteWebhook")
+        requests.get(f"{BASE_URL}/setWebhook?url={RENDER_URL}/{TOKEN}")
+        
+        print(f"✅ Webhook set: {RENDER_URL}/{TOKEN}")
         app.run(host="0.0.0.0", port=PORT)
     else:
-        # Polling মোড (লোকাল টেস্টের জন্য)
-        bot.infinity_polling(timeout=60, long_polling_timeout=60)
+        # Polling মোড (লোকাল/Termux-এর জন্য)
+        print("🚀 Polling mode...")
+        offset = None
+        while True:
+            try:
+                updates = api_call(f"getUpdates?timeout=50&offset={offset}")
+                if updates and "result" in updates:
+                    for update in updates["result"]:
+                        offset = update["update_id"] + 1
+                        if "message" in update:
+                            threading.Thread(target=handle_message, args=(update["message"],), daemon=True).start()
+                        elif "callback_query" in update:
+                            threading.Thread(target=handle_callback, args=(update["callback_query"],), daemon=True).start()
+            except Exception as e:
+                print(f"[POLL] {e}")
+                time.sleep(2)

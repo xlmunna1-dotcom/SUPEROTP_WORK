@@ -5458,4 +5458,29 @@ def main():
             time.sleep(2)
 
 if __name__ == "__main__":
-    main()    
+    import os
+    from flask import Flask, request
+    
+    PORT = int(os.environ.get("PORT", 10000))
+    RENDER_URL = os.environ.get("RENDER_EXTERNAL_URL", "")
+    
+    if RENDER_URL:
+        # Webhook মোড (Render-এর জন্য)
+        app = Flask(__name__)
+        
+        @app.route(f"/{TOKEN}", methods=["POST"])
+        def webhook():
+            update = telebot.types.Update.de_json(request.stream.read().decode("utf-8"))
+            bot.process_new_updates([update])
+            return "OK", 200
+        
+        @app.route("/", methods=["GET"])
+        def health():
+            return "Bot is alive!", 200
+        
+        bot.remove_webhook()
+        bot.set_webhook(url=f"{RENDER_URL}/{TOKEN}")
+        app.run(host="0.0.0.0", port=PORT)
+    else:
+        # Polling মোড (লোকাল টেস্টের জন্য)
+        bot.infinity_polling(timeout=60, long_polling_timeout=60)

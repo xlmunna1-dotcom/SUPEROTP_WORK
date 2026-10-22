@@ -1,0 +1,8 @@
+{
+  "update_id": 1,
+  "title": "🚀 নতুন আপডেট এসেছে!",
+  "html": "<h2>Version 2.0</h2><ul><li>⚡ Fast Speed — অ্যাকাউন্ট অনেক দ্রুত খুলবে</li><li>🔔 OTP আসলেই মোবাইলে নোটিফিকেশন</li><li>📤 OTP সরাসরি Telegram গ্রুপে</li><li>📋 Telegram-এ OTP কপি বাটন</li></ul><p>নতুন ভার্সন নিতে নিচের বাটন চাপো 👇</p>",
+  "button_text": "⬇ UPDATE NOW",
+  "button_url": "https://t.me/your_update_channel",
+  "force": false
+}

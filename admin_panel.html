@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
+<html lang="bn"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEXEX Admin Panel</title>
@@ -202,7 +200,7 @@ input:checked + .slider:before { transform: translateX(24px); }
 <div class="container">
 
   <!-- Status -->
-  <div class="status-bar" id="statusBar">✅ Config saved! App এ নতুন settings apply হবে।</div>
+  <div class="status-bar" id="statusBar" style="display: block;">✅ Config saved! App এ নতুন settings apply হবে।</div>
 
   <!-- ===== TOGGLES ===== -->
   <div class="card">
@@ -217,7 +215,7 @@ input:checked + .slider:before { transform: translateX(24px); }
         <div class="toggle-desc">OTP আসলে notification দেখাবে</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="tog_notification" checked>
+        <input type="checkbox" id="tog_notification" checked="">
         <span class="slider"></span>
       </label>
     </div>
@@ -228,7 +226,7 @@ input:checked + .slider:before { transform: translateX(24px); }
         <div class="toggle-desc">OTP আসলেই Group এ যাবে</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="tog_telegram" checked>
+        <input type="checkbox" id="tog_telegram" checked="">
         <span class="slider"></span>
       </label>
     </div>
@@ -239,7 +237,7 @@ input:checked + .slider:before { transform: translateX(24px); }
         <div class="toggle-desc">App খুললেই popup দেখাবে</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="tog_popup" checked>
+        <input type="checkbox" id="tog_popup" checked="">
         <span class="slider"></span>
       </label>
     </div>
@@ -250,7 +248,7 @@ input:checked + .slider:before { transform: translateX(24px); }
         <div class="toggle-desc">OTP polling 2s এ করবে</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="tog_fast" checked>
+        <input type="checkbox" id="tog_fast" checked="">
         <span class="slider"></span>
       </label>
     </div>
@@ -261,7 +259,7 @@ input:checked + .slider:before { transform: translateX(24px); }
         <div class="toggle-desc">Telegram OTP message এ ৩টি button</div>
       </div>
       <label class="switch">
-        <input type="checkbox" id="tog_channels" checked>
+        <input type="checkbox" id="tog_channels" checked="">
         <span class="slider"></span>
       </label>
     </div>
@@ -343,10 +341,12 @@ input:checked + .slider:before { transform: translateX(24px); }
 
     <!-- Live Preview -->
     <label>🔍 Live Preview:</label>
-    <div class="popup-preview" id="popupPreview">
+    <div class="popup-preview" id="popupPreview" style="background: rgb(0, 0, 0);">
       <div style="display:inline-block;background:#FFD700;color:#000;font-size:10px;font-weight:bold;padding:3px 12px;border-radius:20px;">🚀 NEW UPDATE</div>
-      <div class="p-title" id="prev_title">নতুন আপডেট এসেছে!</div>
-      <div class="p-msg" id="prev_msg">Details...</div>
+      <div class="p-title" id="prev_title" style="color: rgb(255, 0, 0);">🚀 নতুন আপডেট এসেছে!</div>
+      <div class="p-msg" id="prev_msg">✅ Multi Create আরো Fast
+✅ Telegram Auto OTP
+✅ Mobile Notification</div>
       <button class="p-btn1" id="prev_btn1">📥 Download Update</button>
       <button class="p-btn2" id="prev_btn2">📢 Join Channel</button>
     </div>
@@ -355,16 +355,34 @@ input:checked + .slider:before { transform: translateX(24px); }
   <!-- ===== JSON OUTPUT ===== -->
   <div class="card">
     <div class="card-title">📋 Generated Config (App এ এটা যাবে)</div>
-    <div class="preview-box" id="jsonOutput">
-      JSON এখানে দেখাবে...
-    </div>
+    <div class="preview-box" id="jsonOutput">{
+  "version": "1.0",
+  "notification_enabled": true,
+  "telegram_enabled": true,
+  "popup_enabled": true,
+  "fast_speed": true,
+  "channel_buttons": true,
+  "bot_token": "8695846571:AAHHcX1-gdQkxBJ2Iwd1JAKYreOqdUy8wH8",
+  "chat_id": "-1004339378904",
+  "main_url": "https://t.me/SUPER_WORKERS",
+  "update_url": "https://t.me/SUPERWORKERSBACKUP",
+  "bot_url": "@SUPER_WORKER_NUMBER_BOT",
+  "popup_title": "🚀 নতুন আপডেট এসেছে!",
+  "popup_msg": "✅ Multi Create আরো Fast\n✅ Telegram Auto OTP\n✅ Mobile Notification",
+  "btn1_text": "📥 Download Update",
+  "btn1_url": "https://t.me/SUPER_WORKERS",
+  "btn2_text": "📢 Join Channel",
+  "btn2_url": "https://t.me/SUPER_WORKERS",
+  "bg_color": "#000000",
+  "title_color": "#ff0000"
+}</div>
     <button class="btn-copy" onclick="copyJson()">📋 Copy JSON</button>
     <button class="btn-copy" onclick="downloadJson()" style="margin-left:8px">💾 Save as JSON</button>
     <button class="btn-copy" onclick="downloadHtml()" style="margin-left:8px;color:#FFD700;border-color:#FFD700">💾 Save Updated HTML</button>
   </div>
 
   <!-- SAVE -->
-  <button class="btn-save" onclick="saveConfig()">💾 SAVE & GENERATE CONFIG</button>
+  <button class="btn-save" onclick="saveConfig()">💾 SAVE &amp; GENERATE CONFIG</button>
   <br><br>
 
 </div>
@@ -374,29 +392,25 @@ input:checked + .slider:before { transform: translateX(24px); }
 //  CONFIG OBJECT — এটাই App পড়বে
 // =============================================
 var CONFIG = {
-  version: "1.0",
-  // Toggles
-  notification_enabled: true,
-  telegram_enabled: true,
-  popup_enabled: true,
-  fast_speed: true,
-  channel_buttons: true,
-  // Bot
-  bot_token: "",
-  chat_id: "",
-  // Channels
-  main_url: "https://t.me/your_main",
-  update_url: "https://t.me/your_update",
-  bot_url: "https://t.me/your_bot",
-  // Popup
-  popup_title: "🚀 নতুন আপডেট এসেছে!",
-  popup_msg: "✅ Multi Create আরো Fast\n✅ Telegram Auto OTP\n✅ Mobile Notification",
-  btn1_text: "📥 Download Update",
-  btn1_url: "",
-  btn2_text: "📢 Join Channel",
-  btn2_url: "",
-  bg_color: "#1877F2",
-  title_color: "#FFD700"
+  "version": "1.0",
+  "notification_enabled": true,
+  "telegram_enabled": true,
+  "popup_enabled": true,
+  "fast_speed": true,
+  "channel_buttons": true,
+  "bot_token": "8695846571:AAHHcX1-gdQkxBJ2Iwd1JAKYreOqdUy8wH8",
+  "chat_id": "-1004339378904",
+  "main_url": "https://t.me/SUPER_WORKERS",
+  "update_url": "https://t.me/SUPERWORKERSBACKUP",
+  "bot_url": "@SUPER_WORKER_NUMBER_BOT",
+  "popup_title": "🚀 নতুন আপডেট এসেছে!",
+  "popup_msg": "✅ Multi Create আরো Fast\n✅ Telegram Auto OTP\n✅ Mobile Notification",
+  "btn1_text": "📥 Download Update",
+  "btn1_url": "https://t.me/SUPER_WORKERS",
+  "btn2_text": "📢 Join Channel",
+  "btn2_url": "https://t.me/SUPER_WORKERS",
+  "bg_color": "#000000",
+  "title_color": "#ff0000"
 };
 
 // Page load এ fields এ config দেখাও
@@ -550,5 +564,6 @@ document.addEventListener('change', function(e) {
   updatePopupPreview();
 });
 </script>
-</body>
-</html>
+
+
+</body></html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXEX Admin Panel</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0f1e; color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+.header {
+  background: linear-gradient(135deg, #1877F2, #0d47a1);
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(24,119,242,0.4);
+}
+.header h1 { font-size: 22px; letter-spacing: 2px; }
+.header p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+.container { max-width: 700px; margin: 0 auto; padding: 16px; }
+
+.card {
+  background: #141b2d;
+  border: 1px solid #1e2d4a;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #FFD700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #1e2d4a;
+  padding-bottom: 10px;
+}
+
+label { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; margin-top: 12px; }
+input[type=text], input[type=url], textarea {
+  width: 100%;
+  background: #0d1321;
+  border: 1px solid #2a3a5c;
+  border-radius: 8px;
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  transition: border 0.2s;
+}
+input:focus, textarea:focus { border-color: #1877F2; }
+textarea { resize: vertical; min-height: 80px; }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #1e2d4a;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 13px; color: #ddd; }
+.toggle-desc { font-size: 11px; color: #666; margin-top: 2px; }
+
+/* Toggle Switch */
+.switch { position: relative; width: 50px; height: 26px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #333; border-radius: 26px;
+  transition: 0.3s;
+}
+.slider:before {
+  position: absolute; content: "";
+  height: 20px; width: 20px;
+  left: 3px; bottom: 3px;
+  background: white; border-radius: 50%;
+  transition: 0.3s;
+}
+input:checked + .slider { background: #1877F2; }
+input:checked + .slider:before { transform: translateX(24px); }
+
+.color-row { display: flex; gap: 8px; align-items: center; }
+.color-row input[type=color] {
+  width: 46px; height: 36px;
+  border: none; border-radius: 8px;
+  cursor: pointer; padding: 2px;
+  background: #0d1321;
+}
+.color-row input[type=text] { flex: 1; }
+
+.btn-save {
+  width: 100%;
+  background: linear-gradient(135deg, #1877F2, #0d47a1);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+.btn-save:active { opacity: 0.85; }
+
+.btn-copy {
+  background: #1e2d4a;
+  color: #1877F2;
+  border: 1px solid #1877F2;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.preview-box {
+  background: #0d1321;
+  border: 1px solid #1e2d4a;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 12px;
+  font-size: 12px;
+  font-family: monospace;
+  word-break: break-all;
+  color: #4fc3f7;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.status-bar {
+  background: #0d2a0d;
+  border: 1px solid #2a5a2a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #4caf50;
+  margin-bottom: 14px;
+  display: none;
+}
+
+.version-badge {
+  background: #1877F2;
+  color: white;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.channel-preview {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.ch-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+/* Popup Preview */
+.popup-preview {
+  background: rgba(0,0,0,0.6);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 12px;
+  text-align: center;
+}
+.popup-preview .p-title { font-size: 18px; font-weight: bold; margin: 8px 0; }
+.popup-preview .p-msg { font-size: 12px; opacity: 0.85; margin: 8px 0 14px; }
+.popup-preview .p-btn1 {
+  display: block; width: 100%; padding: 10px;
+  border-radius: 8px; font-weight: bold;
+  font-size: 13px; margin: 5px 0; border: none; cursor: pointer;
+  background: #FFD700; color: #000;
+}
+.popup-preview .p-btn2 {
+  display: block; width: 100%; padding: 10px;
+  border-radius: 8px; font-weight: bold;
+  font-size: 13px; margin: 5px 0; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.15); color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ NEXEX ADMIN PANEL</h1>
+  <p>এই HTML ফাইল থেকে সব control করো</p>
+</div>
+
+<div class="container">
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">✅ Config saved! App এ নতুন settings apply হবে।</div>
+
+  <!-- ===== TOGGLES ===== -->
+  <div class="card">
+    <div class="card-title">
+      🔘 Feature Toggles
+      <span class="version-badge" id="versionBadge">v1.0</span>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">🔔 Mobile Notification</div>
+        <div class="toggle-desc">OTP আসলে notification দেখাবে</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tog_notification" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">📤 Telegram Auto Send</div>
+        <div class="toggle-desc">OTP আসলেই Group এ যাবে</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tog_telegram" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">🚀 Update Popup</div>
+        <div class="toggle-desc">App খুললেই popup দেখাবে</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tog_popup" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">⚡ Fast Speed Mode</div>
+        <div class="toggle-desc">OTP polling 2s এ করবে</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tog_fast" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">🔗 Channel Buttons</div>
+        <div class="toggle-desc">Telegram OTP message এ ৩টি button</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tog_channels" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <label>App Version (এই version change করলে popup দেখাবে)</label>
+    <input type="text" id="cfg_version" value="1.0" placeholder="1.0">
+  </div>
+
+  <!-- ===== BOT SETTINGS ===== -->
+  <div class="card">
+    <div class="card-title">🤖 Telegram Bot Settings</div>
+
+    <label>Bot Token</label>
+    <input type="text" id="cfg_bot_token" placeholder="123456789:AAFxxxxxxxxxxxxx">
+
+    <label>Group / Chat ID (OTP এখানে যাবে)</label>
+    <input type="text" id="cfg_chat_id" placeholder="-100xxxxxxxxxx বা @groupname">
+
+    <label>Channel Buttons Preview:</label>
+    <div class="channel-preview" id="channelPreview">
+      <button class="ch-btn" style="background:#22c55e;color:#fff">🟢 Main</button>
+      <button class="ch-btn" style="background:#3b82f6;color:#fff">🔵 Update</button>
+      <button class="ch-btn" style="background:#ef4444;color:#fff">🔴 Bot</button>
+    </div>
+  </div>
+
+  <!-- ===== CHANNEL BUTTONS ===== -->
+  <div class="card">
+    <div class="card-title">🔗 Channel Button Links</div>
+
+    <label>🟢 Main Channel Link</label>
+    <input type="url" id="cfg_main_url" placeholder="https://t.me/your_main_channel">
+
+    <label>🔵 Update Channel Link</label>
+    <input type="url" id="cfg_update_url" placeholder="https://t.me/your_update_channel">
+
+    <label>🔴 Bot Link</label>
+    <input type="url" id="cfg_bot_url" placeholder="https://t.me/your_bot_username">
+  </div>
+
+  <!-- ===== UPDATE POPUP ===== -->
+  <div class="card">
+    <div class="card-title">🚀 Update Popup Content</div>
+
+    <label>Popup Title</label>
+    <input type="text" id="cfg_popup_title" value="🚀 নতুন আপডেট এসেছে!" placeholder="Popup এর title">
+
+    <label>Message (বিস্তারিত লিখো)</label>
+    <textarea id="cfg_popup_msg" placeholder="আপডেটের details লিখো...">✅ Multi Create আরো Fast
+✅ Telegram Auto OTP
+✅ Mobile Notification
+✅ Channel Buttons
+
+👇 Download করো নিচের button থেকে</textarea>
+
+    <label>Button 1 Text (Download button)</label>
+    <input type="text" id="cfg_btn1_txt" value="📥 Download Update" placeholder="Button 1 text">
+
+    <label>Button 1 Link</label>
+    <input type="url" id="cfg_btn1_url" placeholder="https://t.me/your_channel/123">
+
+    <label>Button 2 Text (Channel button)</label>
+    <input type="text" id="cfg_btn2_txt" value="📢 Join Channel" placeholder="Button 2 text">
+
+    <label>Button 2 Link</label>
+    <input type="url" id="cfg_btn2_url" placeholder="https://t.me/your_channel">
+
+    <label>Popup Background Color</label>
+    <div class="color-row">
+      <input type="color" id="cfg_bg_color_picker" value="#1877F2" oninput="document.getElementById('cfg_bg_color').value=this.value; updatePopupPreview()">
+      <input type="text" id="cfg_bg_color" value="#1877F2" oninput="updateBgPicker(); updatePopupPreview()" placeholder="#1877F2">
+    </div>
+
+    <label>Title Color</label>
+    <div class="color-row">
+      <input type="color" id="cfg_title_color_picker" value="#FFD700" oninput="document.getElementById('cfg_title_color').value=this.value; updatePopupPreview()">
+      <input type="text" id="cfg_title_color" value="#FFD700" oninput="updateTitlePicker(); updatePopupPreview()" placeholder="#FFD700">
+    </div>
+
+    <!-- Live Preview -->
+    <label>🔍 Live Preview:</label>
+    <div class="popup-preview" id="popupPreview">
+      <div style="display:inline-block;background:#FFD700;color:#000;font-size:10px;font-weight:bold;padding:3px 12px;border-radius:20px;">🚀 NEW UPDATE</div>
+      <div class="p-title" id="prev_title">নতুন আপডেট এসেছে!</div>
+      <div class="p-msg" id="prev_msg">Details...</div>
+      <button class="p-btn1" id="prev_btn1">📥 Download Update</button>
+      <button class="p-btn2" id="prev_btn2">📢 Join Channel</button>
+    </div>
+  </div>
+
+  <!-- ===== JSON OUTPUT ===== -->
+  <div class="card">
+    <div class="card-title">📋 Generated Config (App এ এটা যাবে)</div>
+    <div class="preview-box" id="jsonOutput">
+      JSON এখানে দেখাবে...
+    </div>
+    <button class="btn-copy" onclick="copyJson()">📋 Copy JSON</button>
+    <button class="btn-copy" onclick="downloadJson()" style="margin-left:8px">💾 Save as JSON</button>
+    <button class="btn-copy" onclick="downloadHtml()" style="margin-left:8px;color:#FFD700;border-color:#FFD700">💾 Save Updated HTML</button>
+  </div>
+
+  <!-- SAVE -->
+  <button class="btn-save" onclick="saveConfig()">💾 SAVE & GENERATE CONFIG</button>
+  <br><br>
+
+</div>
+
+<script>
+// =============================================
+//  CONFIG OBJECT — এটাই App পড়বে
+// =============================================
+var CONFIG = {
+  version: "1.0",
+  // Toggles
+  notification_enabled: true,
+  telegram_enabled: true,
+  popup_enabled: true,
+  fast_speed: true,
+  channel_buttons: true,
+  // Bot
+  bot_token: "",
+  chat_id: "",
+  // Channels
+  main_url: "https://t.me/your_main",
+  update_url: "https://t.me/your_update",
+  bot_url: "https://t.me/your_bot",
+  // Popup
+  popup_title: "🚀 নতুন আপডেট এসেছে!",
+  popup_msg: "✅ Multi Create আরো Fast\n✅ Telegram Auto OTP\n✅ Mobile Notification",
+  btn1_text: "📥 Download Update",
+  btn1_url: "",
+  btn2_text: "📢 Join Channel",
+  btn2_url: "",
+  bg_color: "#1877F2",
+  title_color: "#FFD700"
+};
+
+// Page load এ fields এ config দেখাও
+window.onload = function() {
+  loadFieldsFromConfig();
+  updateJsonOutput();
+  updatePopupPreview();
+};
+
+function loadFieldsFromConfig() {
+  document.getElementById('cfg_version').value       = CONFIG.version;
+  document.getElementById('tog_notification').checked = CONFIG.notification_enabled;
+  document.getElementById('tog_telegram').checked     = CONFIG.telegram_enabled;
+  document.getElementById('tog_popup').checked        = CONFIG.popup_enabled;
+  document.getElementById('tog_fast').checked         = CONFIG.fast_speed;
+  document.getElementById('tog_channels').checked     = CONFIG.channel_buttons;
+  document.getElementById('cfg_bot_token').value      = CONFIG.bot_token;
+  document.getElementById('cfg_chat_id').value        = CONFIG.chat_id;
+  document.getElementById('cfg_main_url').value       = CONFIG.main_url;
+  document.getElementById('cfg_update_url').value     = CONFIG.update_url;
+  document.getElementById('cfg_bot_url').value        = CONFIG.bot_url;
+  document.getElementById('cfg_popup_title').value    = CONFIG.popup_title;
+  document.getElementById('cfg_popup_msg').value      = CONFIG.popup_msg;
+  document.getElementById('cfg_btn1_txt').value       = CONFIG.btn1_text;
+  document.getElementById('cfg_btn1_url').value       = CONFIG.btn1_url;
+  document.getElementById('cfg_btn2_txt').value       = CONFIG.btn2_text;
+  document.getElementById('cfg_btn2_url').value       = CONFIG.btn2_url;
+  document.getElementById('cfg_bg_color').value       = CONFIG.bg_color;
+  document.getElementById('cfg_title_color').value    = CONFIG.title_color;
+  try {
+    document.getElementById('cfg_bg_color_picker').value    = CONFIG.bg_color;
+    document.getElementById('cfg_title_color_picker').value = CONFIG.title_color;
+  } catch(e) {}
+  document.getElementById('versionBadge').textContent = 'v' + CONFIG.version;
+}
+
+function saveConfig() {
+  CONFIG.version              = document.getElementById('cfg_version').value.trim();
+  CONFIG.notification_enabled = document.getElementById('tog_notification').checked;
+  CONFIG.telegram_enabled     = document.getElementById('tog_telegram').checked;
+  CONFIG.popup_enabled        = document.getElementById('tog_popup').checked;
+  CONFIG.fast_speed           = document.getElementById('tog_fast').checked;
+  CONFIG.channel_buttons      = document.getElementById('tog_channels').checked;
+  CONFIG.bot_token            = document.getElementById('cfg_bot_token').value.trim();
+  CONFIG.chat_id              = document.getElementById('cfg_chat_id').value.trim();
+  CONFIG.main_url             = document.getElementById('cfg_main_url').value.trim();
+  CONFIG.update_url           = document.getElementById('cfg_update_url').value.trim();
+  CONFIG.bot_url              = document.getElementById('cfg_bot_url').value.trim();
+  CONFIG.popup_title          = document.getElementById('cfg_popup_title').value.trim();
+  CONFIG.popup_msg            = document.getElementById('cfg_popup_msg').value.trim();
+  CONFIG.btn1_text            = document.getElementById('cfg_btn1_txt').value.trim();
+  CONFIG.btn1_url             = document.getElementById('cfg_btn1_url').value.trim();
+  CONFIG.btn2_text            = document.getElementById('cfg_btn2_txt').value.trim();
+  CONFIG.btn2_url             = document.getElementById('cfg_btn2_url').value.trim();
+  CONFIG.bg_color             = document.getElementById('cfg_bg_color').value.trim();
+  CONFIG.title_color          = document.getElementById('cfg_title_color').value.trim();
+
+  document.getElementById('versionBadge').textContent = 'v' + CONFIG.version;
+  updateJsonOutput();
+  updatePopupPreview();
+
+  var bar = document.getElementById('statusBar');
+  bar.style.display = 'block';
+  setTimeout(function() { bar.style.display = 'none'; }, 3000);
+}
+
+function updateJsonOutput() {
+  var json = JSON.stringify(CONFIG, null, 2);
+  document.getElementById('jsonOutput').textContent = json;
+}
+
+function updatePopupPreview() {
+  var bg    = document.getElementById('cfg_bg_color').value || '#1877F2';
+  var tc    = document.getElementById('cfg_title_color').value || '#FFD700';
+  var title = document.getElementById('cfg_popup_title').value || 'Title';
+  var msg   = document.getElementById('cfg_popup_msg').value || 'Message';
+  var b1    = document.getElementById('cfg_btn1_txt').value || 'Button 1';
+  var b2    = document.getElementById('cfg_btn2_txt').value || 'Button 2';
+
+  var prev = document.getElementById('popupPreview');
+  prev.style.background = bg;
+
+  document.getElementById('prev_title').style.color = tc;
+  document.getElementById('prev_title').textContent = title;
+  document.getElementById('prev_msg').textContent   = msg;
+  document.getElementById('prev_btn1').textContent  = b1;
+  document.getElementById('prev_btn2').textContent  = b2;
+}
+
+function updateBgPicker() {
+  try { document.getElementById('cfg_bg_color_picker').value = document.getElementById('cfg_bg_color').value; } catch(e) {}
+}
+function updateTitlePicker() {
+  try { document.getElementById('cfg_title_color_picker').value = document.getElementById('cfg_title_color').value; } catch(e) {}
+}
+
+function copyJson() {
+  var text = document.getElementById('jsonOutput').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('✅ JSON Copied!');
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('✅ JSON Copied!');
+  }
+}
+
+function downloadJson() {
+  saveConfig();
+  var text = document.getElementById('jsonOutput').textContent;
+  var blob = new Blob([text], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'nexex_config.json';
+  a.click();
+}
+
+function downloadHtml() {
+  saveConfig();
+  // এই HTML page এর source এ CONFIG object update করে save করো
+  var src = document.documentElement.outerHTML;
+  // CONFIG এর current value inject করো
+  var configStr = 'var CONFIG = ' + JSON.stringify(CONFIG, null, 2) + ';';
+  src = src.replace(/var CONFIG = \{[\s\S]*?\};/, configStr);
+  var blob = new Blob([src], { type: 'text/html;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'admin_panel.html';
+  a.click();
+}
+
+// Live update on input change
+document.addEventListener('input', function(e) {
+  var id = e.target.id;
+  if (id && id.startsWith('cfg_popup') || id === 'cfg_btn1_txt' || id === 'cfg_btn2_txt') {
+    updatePopupPreview();
+  }
+  if (id === 'cfg_bg_color' || id === 'cfg_title_color') {
+    updatePopupPreview();
+  }
+  updateJsonOutput();
+});
+document.addEventListener('change', function(e) {
+  updateJsonOutput();
+  updatePopupPreview();
+});
+</script>
+</body>
+</html>
